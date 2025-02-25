@@ -9,20 +9,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 
-// ----------------------------
-// JwtTokenProvider.java
-// ----------------------------
 @Component
 public class JwtTokenProvider {
 
@@ -57,8 +49,6 @@ public class JwtTokenProvider {
 
     @Transactional
     public RefreshToken generateRefreshToken(User user) {
-        refreshTokenRepository.deleteByUser(user);
-
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setUser(user);
@@ -84,15 +74,33 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    public String refreshAccessToken(String refreshTokenStr) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
+    /**
+     * Rotates the refresh token by invalidating the old one and issuing a new token.
+     * @param refreshTokenStr The old refresh token string.
+     * @return A map containing the new access token and new refresh token.
+     */
+    @Transactional
+    public Map<String, String> rotateRefreshToken(String refreshTokenStr) {
+        RefreshToken oldRefreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token."));
 
-        if (refreshToken.getExpiryDate().before(new Date())) {
-            refreshTokenRepository.delete(refreshToken);
+        if (oldRefreshToken.getExpiryDate().before(new Date())) {
+            refreshTokenRepository.delete(oldRefreshToken);
             throw new RuntimeException("Refresh token has expired. Please log in again.");
         }
 
-        return generateAccessToken(refreshToken.getUser().getEmail());
+        User user = oldRefreshToken.getUser();
+
+        // Delete the old refresh token to invalidate it
+        refreshTokenRepository.delete(oldRefreshToken);
+
+        // Generate new tokens
+        String newAccessToken = generateAccessToken(user.getEmail());
+        RefreshToken newRefreshToken = generateRefreshToken(user);
+
+        return Map.of(
+                "accessToken", newAccessToken,
+                "refreshToken", newRefreshToken.getToken()
+        );
     }
 }
