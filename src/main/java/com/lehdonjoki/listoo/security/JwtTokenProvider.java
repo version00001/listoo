@@ -28,11 +28,9 @@ public class JwtTokenProvider {
     private int jwtRefreshExpirationMs;
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserRepository userRepository;
 
-    public JwtTokenProvider(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+    public JwtTokenProvider(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.userRepository = userRepository;
     }
 
     public String generateAccessToken(String email) {
