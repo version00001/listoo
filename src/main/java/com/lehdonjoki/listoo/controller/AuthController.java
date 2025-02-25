@@ -26,12 +26,12 @@ public class AuthController {
         String refreshToken = request.get("refreshToken");
 
         if (refreshToken == null || refreshToken.isEmpty()) {
-            return ResponseEntity.badRequest().body("Refresh token is required.");
+            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is required."));
         }
 
         try {
-            String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+            Map<String, String> tokens = jwtTokenProvider.rotateRefreshToken(refreshToken);
+            return ResponseEntity.ok(tokens);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
