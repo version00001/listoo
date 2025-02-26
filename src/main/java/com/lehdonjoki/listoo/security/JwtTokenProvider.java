@@ -22,10 +22,10 @@ public class JwtTokenProvider {
     private String jwtSecret;
 
     @Value("${jwt.accessExpirationMs}")
-    private int jwtAccessExpirationMs;
+    private long jwtAccessExpirationMs;
 
     @Value("${jwt.refreshExpirationMs}")
-    private int jwtRefreshExpirationMs;
+    private long jwtRefreshExpirationMs;
 
     private final RefreshTokenRepository refreshTokenRepository;
 
