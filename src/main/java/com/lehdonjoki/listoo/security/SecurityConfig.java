@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin().disable()
-            .httpBasic().disable();
+            .formLogin().disable() // Disable default form login (if using JWT or custom login)
+            .httpBasic().disable(); // Disable HTTP basic auth
 
         return http.build();
     }
