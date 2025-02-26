@@ -48,7 +48,7 @@ public class AuthController {
         String password = request.get("password");
 
         try {
-            // Authenticate user using AuthenticationManager
+            // Authenticate user using email as the username
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
