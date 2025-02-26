@@ -101,4 +101,13 @@ public class JwtTokenProvider {
                 "refreshToken", newRefreshToken.getToken()
         );
     }
+
+    /**
+     * Logs out the user by deleting all refresh tokens associated with them.
+     * @param user The user to log out.
+     */
+    @Transactional
+    public void logout(User user) {
+        refreshTokenRepository.deleteByUser(user);
+    }
 }
