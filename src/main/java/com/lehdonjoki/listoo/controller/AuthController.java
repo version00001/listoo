@@ -58,4 +58,15 @@ public class AuthController {
                 "refreshToken", refreshToken.getToken()
         ));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found."));
+
+        jwtTokenProvider.logout(user);
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully."));
+    }
 }
