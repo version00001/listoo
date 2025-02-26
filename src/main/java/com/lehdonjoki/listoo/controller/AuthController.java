@@ -2,7 +2,9 @@ package com.lehdonjoki.listoo.controller;
 
 import com.lehdonjoki.listoo.model.User;
 import com.lehdonjoki.listoo.service.AuthService;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,9 +25,10 @@ public class AuthController {
     }
 
     /**
-     * Endpoint to register a new user.
+     * ✅ Endpoint to register a new user.
      */
     @PostMapping("/register")
+    @PermitAll
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String password = request.get("password");
@@ -40,9 +43,10 @@ public class AuthController {
     }
 
     /**
-     * Endpoint to authenticate a user and return access and refresh tokens.
+     * ✅ Endpoint to authenticate a user and return access and refresh tokens.
      */
     @PostMapping("/login")
+    @PermitAll
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String password = request.get("password");
@@ -62,9 +66,10 @@ public class AuthController {
     }
 
     /**
-     * Endpoint to refresh access and refresh tokens.
+     * ✅ Endpoint to refresh access and refresh tokens.
      */
     @PostMapping("/refresh-token")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
 
@@ -81,9 +86,10 @@ public class AuthController {
     }
 
     /**
-     * Endpoint to log out a user by deleting their refresh tokens.
+     * ✅ Endpoint to log out a user by deleting their refresh tokens.
      */
     @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
         String email = request.get("email");
 
