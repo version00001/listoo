@@ -2,37 +2,27 @@ package com.lehdonjoki.listoo.service;
 
 import com.lehdonjoki.listoo.model.User;
 import com.lehdonjoki.listoo.repository.UserRepository;
-import com.lehdonjoki.listoo.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager,
-                       JwtTokenProvider jwtTokenProvider) {
+                       TokenService tokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.tokenService = tokenService;
     }
 
-    /**
-     * Registers a new user with the provided details.
-     */
     public User register(String email, String password, String name) {
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email is already in use.");
@@ -46,32 +36,23 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    /**
-     * Authenticates a user and returns a JWT token.
-     */
-    public String login(String email, String password) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
-
-        return jwtTokenProvider.generateToken(authentication);
+    public Map<String, String> generateTokens(Authentication authentication) {
+        String email = authentication.getName();
+        User user = getUserByEmail(email);
+        return tokenService.generateTokens(user);
     }
 
-    /**
-     * Refreshes an access token using a valid refresh token.
-     */
-    public String refreshToken(String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token.");
-        }
+    public Map<String, String> refreshToken(String refreshTokenStr) {
+        return tokenService.refreshToken(refreshTokenStr);
+    }
 
-        String email = jwtTokenProvider.getUsernameFromToken(refreshToken);
-        Optional<User> userOptional = userRepository.findByEmail(email);
+    public void logout(String email) {
+        User user = getUserByEmail(email);
+        tokenService.logout(user);
+    }
 
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException("User not found.");
-        }
-
-        return jwtTokenProvider.generateTokenFromEmail(email);
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 }
