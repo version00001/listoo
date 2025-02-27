@@ -43,7 +43,17 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
+                // Allow Swagger UI and API docs without authentication
+                .requestMatchers(
+                    "/swagger-ui/**", 
+                    "/swagger-ui.html", 
+                    "/v3/api-docs/**", 
+                    "/swagger-resources/**", 
+                    "/webjars/**"
+                ).permitAll()
+                // Allow public access to authentication endpoints
                 .requestMatchers("/api/auth/**").permitAll()
+                // Secure all other endpoints
                 .anyRequest().authenticated()
             )
             .formLogin().disable() // Disable default form login (if using JWT or custom login)
