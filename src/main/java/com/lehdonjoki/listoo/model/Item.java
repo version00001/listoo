@@ -27,10 +27,10 @@ public class Item {
     @JoinColumn(name = "shopping_list_id", nullable = false)
     private ShoppingList shoppingList;
 
-    public Item(String name, int quantity, boolean purchased, ShoppingList shoppingList) {
+    public Item(String name, int quantity, ShoppingList shoppingList) {
         this.name = name;
         this.quantity = quantity;
-        this.purchased = purchased;
+        this.purchased = false;
         this.shoppingList = shoppingList;
     }
 }
