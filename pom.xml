@@ -74,6 +74,13 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- PostgreSQL JDBC driver --> 
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- Swagger OpenAPI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
