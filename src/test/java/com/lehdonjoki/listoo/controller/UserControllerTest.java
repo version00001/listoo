@@ -8,7 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.lehdonjoki.listoo.model.User;
 import com.lehdonjoki.listoo.repository.UserRepository;
-import com.lehdonjoki.listoo.testutils.AbstractTestWithPostgres;
+import com.lehdonjoki.listoo.testutils.TestingDatabase;
 
 import io.restassured.http.ContentType;
 
@@ -22,9 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc // ✅ Enables MockMvc
-public class UserControllerTest extends AbstractTestWithPostgres {
+@TestingDatabase
+public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc; // ✅ Use MockMvc for security tests
