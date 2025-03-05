@@ -8,12 +8,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Shopping List API")
-                        .version("1.0")
-                        .description("API documentation for the Shopping List App Backend"));
-    }
+  @Bean
+  public OpenAPI customOpenAPI() {
+    return new OpenAPI()
+        .info(
+            new Info()
+                .title("Shopping List API")
+                .version("1.0")
+                .description("API documentation for the Shopping List App Backend"));
+  }
 }

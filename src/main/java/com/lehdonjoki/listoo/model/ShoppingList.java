@@ -10,23 +10,23 @@ import lombok.*;
 @AllArgsConstructor
 public class ShoppingList {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @Column(nullable = false)
-    private boolean archived = false;
+  @Column(nullable = false)
+  private boolean archived = false;
 
-    public ShoppingList(String name, User user) {
-        this.name = name;
-        this.user = user;
-        this.archived = false;
-    }
+  public ShoppingList(String name, User user) {
+    this.name = name;
+    this.user = user;
+    this.archived = false;
+  }
 }
