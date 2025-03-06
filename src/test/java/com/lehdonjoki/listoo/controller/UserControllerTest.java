@@ -31,7 +31,6 @@ public class UserControllerTest {
 
   @BeforeEach
   public void setupTestUser() {
-    userRepository.deleteAll();
     User testUser =
         new User(null, "test@example.com", passwordEncoder.encode("password"), "Test User");
     userRepository.save(testUser);
