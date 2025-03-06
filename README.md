@@ -2,6 +2,10 @@
 
 mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 
+# How to run tests
+
+mvn test "-Dspring-boot.run.profiles=test"
+
 # Swagger UI at:
 
 Swagger UI: http://localhost:8080/swagger-ui.html
