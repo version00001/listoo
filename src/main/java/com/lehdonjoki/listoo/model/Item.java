@@ -33,4 +33,11 @@ public class Item {
     this.purchased = false;
     this.shoppingList = shoppingList;
   }
+
+  public Item(String name, int quantity, boolean purchased, ShoppingList shoppingList) {
+    this.name = name;
+    this.quantity = quantity;
+    this.purchased = purchased;
+    this.shoppingList = shoppingList;
+  }
 }
