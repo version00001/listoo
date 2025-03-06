@@ -1,6 +1,6 @@
 # How to start
 
-mvn spring-boot:run
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 
 # Swagger UI at:
 
