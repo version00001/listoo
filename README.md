@@ -28,3 +28,7 @@ Stops & removes containers but keeps database data.
 ```sql
 docker-compose down
 ```
+
+# JWT secret generation
+
+openssl rand -base64 129 | tr -d '\n'
