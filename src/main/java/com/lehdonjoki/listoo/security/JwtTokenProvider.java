@@ -1,109 +1,69 @@
 package com.lehdonjoki.listoo.security;
 
-import com.lehdonjoki.listoo.model.RefreshToken;
-import com.lehdonjoki.listoo.model.User;
-import com.lehdonjoki.listoo.repository.RefreshTokenRepository;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.transaction.Transactional;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-  @Value("${jwt.secret}")
-  private String jwtSecret;
+    private final Key ACCESS_SECRET_KEY;
+    private final Key REFRESH_SECRET_KEY;
 
-  @Value("${jwt.accessExpirationMs}")
-  private long jwtAccessExpirationMs;
+    private static final long ACCESS_EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes
+    private static final long REFRESH_EXPIRATION_TIME = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-  @Value("${jwt.refreshExpirationMs}")
-  private long jwtRefreshExpirationMs;
-
-  private final RefreshTokenRepository refreshTokenRepository;
-
-  public JwtTokenProvider(RefreshTokenRepository refreshTokenRepository) {
-    this.refreshTokenRepository = refreshTokenRepository;
-  }
-
-  public String generateAccessToken(String email) {
-    Date now = new Date();
-    Date expiryDate = new Date(now.getTime() + jwtAccessExpirationMs);
-
-    return Jwts.builder()
-        .setSubject(email)
-        .setIssuedAt(now)
-        .setExpiration(expiryDate)
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
-        .compact();
-  }
-
-  @Transactional
-  public RefreshToken generateRefreshToken(User user) {
-    RefreshToken refreshToken = new RefreshToken();
-    refreshToken.setToken(UUID.randomUUID().toString());
-    refreshToken.setUser(user);
-    refreshToken.setExpiryDate(new Date(System.currentTimeMillis() + jwtRefreshExpirationMs));
-
-    return refreshTokenRepository.save(refreshToken);
-  }
-
-  public boolean validateToken(String token) {
-    try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
-  public String getUsernameFromToken(String token) {
-    Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-    return claims.getSubject();
-  }
-
-  /**
-   * Rotates the refresh token by invalidating the old one and issuing a new token.
-   *
-   * @param refreshTokenStr The old refresh token string.
-   * @return A map containing the new access token and new refresh token.
-   */
-  @Transactional
-  public Map<String, String> rotateRefreshToken(String refreshTokenStr) {
-    RefreshToken oldRefreshToken =
-        refreshTokenRepository
-            .findByToken(refreshTokenStr)
-            .orElseThrow(() -> new RuntimeException("Invalid refresh token."));
-
-    if (oldRefreshToken.getExpiryDate().before(new Date())) {
-      refreshTokenRepository.delete(oldRefreshToken);
-      throw new RuntimeException("Refresh token has expired. Please log in again.");
+    public JwtTokenProvider(
+            @Value("${jwt.access.secret}") String accessSecret,
+            @Value("${jwt.refresh.secret}") String refreshSecret) {
+        this.ACCESS_SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(accessSecret));
+        this.REFRESH_SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(refreshSecret));
     }
 
-    User user = oldRefreshToken.getUser();
+    public String generateAccessToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME))
+                .signWith(ACCESS_SECRET_KEY, SignatureAlgorithm.HS512)
+                .compact();
+    }
 
-    // Delete the old refresh token to invalidate it
-    refreshTokenRepository.delete(oldRefreshToken);
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
+                .signWith(REFRESH_SECRET_KEY, SignatureAlgorithm.HS512)
+                .compact();
+    }
 
-    // Generate new tokens
-    String newAccessToken = generateAccessToken(user.getEmail());
-    RefreshToken newRefreshToken = generateRefreshToken(user);
+    public boolean validateToken(String token, boolean isRefreshToken) {
+        try {
+            Key signingKey = isRefreshToken ? REFRESH_SECRET_KEY : ACCESS_SECRET_KEY;
+            Jwts.parserBuilder()
+                    .setSigningKey(signingKey)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-    return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken.getToken());
-  }
-
-  /**
-   * Logs out the user by deleting all refresh tokens associated with them.
-   *
-   * @param user The user to log out.
-   */
-  @Transactional
-  public void logout(User user) {
-    refreshTokenRepository.deleteByUser(user);
-  }
+    public String extractEmail(String token, boolean isRefreshToken) {
+        Key signingKey = isRefreshToken ? REFRESH_SECRET_KEY : ACCESS_SECRET_KEY;
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 }
