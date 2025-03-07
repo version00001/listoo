@@ -17,7 +17,7 @@ public class AuthRequestDTO {
     @NotBlank(message = "Email is required")
     private String email;
 
-    @Schema(description = "User's password", example = "strongpassword123")
+    @Schema(description = "User's password", example = "P@ssw0rd!")
     @NotBlank(message = "Password is required")
     private String password;
 }
