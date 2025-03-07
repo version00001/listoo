@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.lehdonjoki.listoo.model.User;
 import com.lehdonjoki.listoo.repository.UserRepository;
-import com.lehdonjoki.listoo.service.AuthService;
 import com.lehdonjoki.listoo.testutils.TestingDatabase;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,18 +38,23 @@ public class AuthControllerTest {
 
   @Test
   public void testRegister() throws Exception {
-    mockMvc.perform(post("/api/auth/register")
-            .contentType(ContentType.JSON.toString())
-            .content("{\"email\": \"newuser@example.com\", \"password\": \"password123\", \"name\": \"New User\"}"))
+    mockMvc
+        .perform(
+            post("/api/auth/register")
+                .contentType(ContentType.JSON.toString())
+                .content(
+                    "{\"email\": \"newuser@example.com\", \"password\": \"password123\", \"name\": \"New User\"}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("User registered successfully."));
   }
 
   @Test
   public void testLogin() throws Exception {
-    mockMvc.perform(post("/api/auth/login")
-            .contentType(ContentType.JSON.toString())
-            .content("{\"email\": \"test@example.com\", \"password\": \"password\"}"))
+    mockMvc
+        .perform(
+            post("/api/auth/login")
+                .contentType(ContentType.JSON.toString())
+                .content("{\"email\": \"test@example.com\", \"password\": \"password\"}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.accessToken").exists())
         .andExpect(jsonPath("$.refreshToken").exists());
@@ -70,11 +74,15 @@ public class AuthControllerTest {
   } */
 
   @Test
-  @WithMockUser(username = "test@example.com", roles = {"USER"})
+  @WithMockUser(
+      username = "test@example.com",
+      roles = {"USER"})
   public void testLogout() throws Exception {
-    mockMvc.perform(post("/api/auth/logout")
-            .contentType(ContentType.JSON.toString())
-            .content("{\"email\": \"test@example.com\"}"))
+    mockMvc
+        .perform(
+            post("/api/auth/logout")
+                .contentType(ContentType.JSON.toString())
+                .content("{\"email\": \"test@example.com\"}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Logged out successfully."));
   }
