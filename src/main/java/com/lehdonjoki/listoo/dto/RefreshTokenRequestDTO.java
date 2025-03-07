@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RefreshTokenRequestDTO {
 
-    @Schema(description = "Refresh token for generating new access token", example = "eyJhbGciOiJIUzI1...")
-    @NotBlank(message = "Refresh token is required")
-    private String refreshToken;
+  @Schema(
+      description = "Refresh token for generating new access token",
+      example = "eyJhbGciOiJIUzI1...")
+  @NotBlank(message = "Refresh token is required")
+  private String refreshToken;
 }
