@@ -6,17 +6,19 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j // ✅ Auto-generates the logger
 @Component
 public class JwtTokenProvider {
 
   private final Key ACCESS_SECRET_KEY;
   private final Key REFRESH_SECRET_KEY;
 
-  private static final long ACCESS_EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes
-  private static final long REFRESH_EXPIRATION_TIME = 30 * 24 * 60 * 60 * 1000; // 30 days
+  private static final long ACCESS_EXPIRATION_TIME = 15L * 60 * 1000; // 15 minutes
+  private static final long REFRESH_EXPIRATION_TIME = 30L * 24 * 60 * 60 * 1000; // 30 days
 
   public JwtTokenProvider(
       @Value("${jwt.access.secret}") String accessSecret,
