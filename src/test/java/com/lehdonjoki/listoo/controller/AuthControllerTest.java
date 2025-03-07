@@ -17,7 +17,7 @@ public class AuthControllerTest {
   private final AuthService authService;
   private final AuthenticationManager authenticationManager;
 
-  public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
+  public AuthControllerTest(AuthService authService, AuthenticationManager authenticationManager) {
     this.authService = authService;
     this.authenticationManager = authenticationManager;
   }
