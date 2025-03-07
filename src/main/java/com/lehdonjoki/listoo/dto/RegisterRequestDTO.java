@@ -12,16 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterRequestDTO {
 
-    @Schema(description = "User's email address", example = "user@example.com")
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is required")
-    private String email;
+  @Schema(description = "User's email address", example = "user@example.com")
+  @Email(message = "Invalid email format")
+  @NotBlank(message = "Email is required")
+  private String email;
 
-    @Schema(description = "User's password", example = "P@ssw0rd!")
-    @NotBlank(message = "Password is required")
-    private String password;
+  @Schema(description = "User's password", example = "P@ssw0rd!")
+  @NotBlank(message = "Password is required")
+  private String password;
 
-    @Schema(description = "User's full name", example = "John Doe")
-    @NotBlank(message = "Name is required")
-    private String name;
+  @Schema(description = "User's full name", example = "John Doe")
+  @NotBlank(message = "Name is required")
+  private String name;
 }
