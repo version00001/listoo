@@ -2,6 +2,9 @@ package com.lehdonjoki.listoo.controller;
 
 import com.lehdonjoki.listoo.model.ShoppingList;
 import com.lehdonjoki.listoo.service.ShoppingListService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/lists")
+@SecurityRequirement(name = "BearerAuth")
 public class ShoppingListController {
 
   private final ShoppingListService shoppingListService;
